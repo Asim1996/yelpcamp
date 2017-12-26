@@ -16,7 +16,8 @@ var express     = require("express"),
 var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
     indexRoutes      = require("./routes/index")
-var url=process.env.DATABASEURL || "mongodb://localhost/yelp_camp_v6"
+var url=process.env.DATABASEURL || "mongodb://localhost:27017/YelpCamp"
+console.log(process.env.DATABASEURL);
 mongoose.connect(url)
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
@@ -24,13 +25,14 @@ app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.use(flash());
 //seedDB();
-
+const port=process.env.PORT||3000;
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
     secret: "Once again Rusty wins cutest dog!",
     resave: false,
     saveUninitialized: false
 }));
+app.locals.moment=require('moment');
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
@@ -46,6 +48,6 @@ app.use(function(req, res, next){
 app.use("/", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
-app.listen(process.env.PORT, process.env.IP, function(){
+app.listen(port, process.env.IP, function(){
    console.log("The YelpCamp Server Has Started!");
 });

@@ -4,6 +4,7 @@ html {
 }
 body {
   /* Margin bottom by footer height */
+
   margin-bottom: 60px;
 }
 .footer {
@@ -14,7 +15,10 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
-
+#map{
+  height:400px;
+  width:100%;
+}
 .container .text-muted {
   margin: 20px 0;
 }
@@ -32,16 +36,4 @@ body {
 .delete-form{
     display:inline;
 }
-/*.fcenter{*/
-/*    padding-top: 20px;*/
-/*    text-align: center;*/
-/*}*/
-/*.footer{*/
-    
-/*    bottom: 0;*/
-/*    width: 100%;*/
-/*    height:60px;*/
-/*    background-color: #f5f5f5;*/
-/*}*/
-/* Sticky footer styles
--------------------------------------------------- */
+
