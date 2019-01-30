@@ -2,7 +2,16 @@ var express = require("express");
 var router  = express.Router();
 var Campground = require("../models/campground");
 var middleware=require("../middleware");
-var geocoder= require('geocoder');
+var NodeGeocoder = require('node-geocoder');
+ 
+var options = {
+  provider: 'google',
+  httpAdapter: 'https',
+  apiKey: process.env.GEOCODER_API_KEY,
+  formatter: null
+};
+ 
+var geocoder = NodeGeocoder(options);
 //INDEX - show all campgrounds
 router.get("/", function(req, res){
     // Get all campgrounds from DB
@@ -39,9 +48,13 @@ router.post("/",middleware.isLoggedIn, function(req, res){
         
     };
   geocoder.geocode(req.body.location, function (err, data) {
-    var lat = data.results[0].geometry.location.lat;
-    var lng = data.results[0].geometry.location.lng;
-    var location = data.results[0].formatted_address;
+     if (err || !data.length) {
+      req.flash('error', 'Invalid address',err);
+      return res.redirect('back');
+    }
+    var lat = data[0].latitude;
+    var lng = data[0].longitude;
+    var location = data[0].formattedAddress;
     var newCampground = {name: name, image: image, description: desc, price: price, author:author, location: location, lat: lat, lng: lng};
     // Create a new campground and save to DB
     Campground.create(newCampground, function(err, newlyCreated){
@@ -83,9 +96,15 @@ router.get("/:id/edit",middleware.checkCampgroundOwnership, function(req, res){
 //Update
 router.put("/:id",middleware.checkCampgroundOwnership,function(req,res){
      geocoder.geocode(req.body.location, function (err, data) {
-    var lat = data.results[0].geometry.location.lat;
-    var lng = data.results[0].geometry.location.lng;
-    var location = data.results[0].formatted_address;
+      console.log('data',data);
+      if (err || !data.length) {
+          console.log(err);
+      req.flash('error', 'Invalid address');
+      return res.redirect('back');
+    }
+    var lat = data[0].latitude;
+    var lng = data[0].longitude;
+    var location = data[0].formattedAddress;
     var newData = {name: req.body.name, image: req.body.image, description: req.body.description, price: req.body.price, location: location, lat: lat, lng: lng};
     Campground.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, campground){
         if(err){
